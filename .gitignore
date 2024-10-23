@@ -163,7 +163,6 @@ mono_crash.*
 
 /generated_cv
 data_folder/secrets.yaml
-/data_folder/secrets.yaml
-/data_folder/*
+data_folder/*
 pip.txt
 
