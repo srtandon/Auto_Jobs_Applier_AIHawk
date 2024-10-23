@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import WebDriverException
 from lib_resume_builder_AIHawk import Resume, FacadeManager, ResumeGenerator, StyleManager
-from src.utils import chrome_browser_options
+from src.utils import chrome_browser_options, safe_load_yaml
 from src.llm.llm_manager import GPTAnswerer
 from src.aihawk_authenticator import AIHawkAuthenticator
 from src.aihawk_bot_facade import AIHawkBotFacade
@@ -153,7 +153,19 @@ def init_browser() -> webdriver.Chrome:
         options = chrome_browser_options()
         service = ChromeService(ChromeDriverManager().install())
         return webdriver.Chrome(service=service, options=options)
-    except Exception as e:
+    except:
+        # try:
+        #     options = chrome_browser_options()
+        #     web_config = safe_load_yaml("data_folder/web_config.yaml")
+        #     if "chrome_path" in web_config:
+        #         chrome_path = web_config["chrome_path"]
+        #         logger.info(chrome_path)
+        #         options.binary_location = chrome_path
+        #         service = ChromeService(ChromeDriverManager().install())
+        #         return webdriver.Chrome(service=service, options=options)
+        #     else:
+        #         raise KeyError(f"Failed to initialize browser. Attempted to point to chrome app path, 'chrome_path' not found in web_config yaml file.")
+        # except Exception as e:
         raise RuntimeError(f"Failed to initialize browser: {str(e)}")
 
 def create_and_run_bot(parameters, llm_api_key):
@@ -194,7 +206,9 @@ def create_and_run_bot(parameters, llm_api_key):
 @click.command()
 @click.option('--resume', type=click.Path(exists=True, file_okay=True, dir_okay=False, path_type=Path), help="Path to the resume PDF file")
 @click.option('--collect', is_flag=True, help="Only collects data job information into data.json file")
-def main(collect: False, resume: Path = None):
+@click.option('--maxnumjobs', type=int, default=None, help="Maximum number of jobs to apply to.")
+@click.option('--maxfail', type=int, default=None, help="Maximum number of jobs apps failed. For testing a new feature.")
+def main(collect: False, resume: Path = None, maxnumjobs: int = None, maxfail: int = None):
     try:
         data_folder = Path("data_folder")
         secrets_file, config_file, plain_text_resume_file, output_folder = FileManager.validate_data_folder(data_folder)
@@ -205,6 +219,8 @@ def main(collect: False, resume: Path = None):
         parameters['uploads'] = FileManager.file_paths_to_dict(resume, plain_text_resume_file)
         parameters['outputFileDirectory'] = output_folder
         parameters['collectMode'] = collect
+        parameters['maxNumJobs'] = maxnumjobs
+        parameters['maxFail'] = maxfail
         
         create_and_run_bot(parameters, llm_api_key)
     except ConfigError as ce:

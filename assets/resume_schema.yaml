@@ -15,7 +15,7 @@ personal_information:
     email: {type: string, format: email}
     github: {type: string, format: uri}
     linkedin: {type: string, format: uri}
-  required: [name, surname, date_of_birth, country, city, address, zip_code, phone_prefix, phone, email]
+  required: [name, surname, country, city, address, zip_code, phone_prefix, phone, email]
 
 education_details:
   type: array
@@ -24,13 +24,13 @@ education_details:
     properties:
       degree: {type: string}
       university: {type: string}
-      gpa: {type: string}
+      # gpa: {type: string}
       graduation_year: {type: string}
       field_of_study: {type: string}
-      exam:
-        type: object
-        additionalProperties: {type: string}
-    required: [degree, university, gpa, graduation_year, field_of_study]
+      # exam:
+      #   type: object
+      #   additionalProperties: {type: string}
+    required: [degree, university, graduation_year, field_of_study]
 
 experience_details:
   type: array
@@ -72,6 +72,16 @@ achievements:
 certifications:
   type: array
   items: {type: string}
+
+skills:
+  type: array
+  items:
+    type: object
+    properties:
+      skill: {type: string}
+      years_of_experience: {type: int}
+      proficiency: {type: string}
+    required: [skill, years_of_experience]
 
 languages:
   type: array

@@ -3,7 +3,10 @@ import os
 import random
 import sys
 import time
-
+import yaml
+import select
+from yaml.loader import SafeLoader
+from builtins import input
 from selenium import webdriver
 from loguru import logger
 
@@ -166,3 +169,59 @@ def printyellow(text):
     reset = "\033[0m"
     logger.debug("Printing text in yellow: %s", text)
     print(f"{yellow}{text}{reset}")
+
+def safe_load_yaml(file_path):
+    """
+    Safely load a YAML file.
+    
+    Args:
+        file_path (str): Path to the YAML file.
+    
+    Returns:
+        dict: Parsed YAML content.
+    
+    Raises:
+        yaml.YAMLError: If there's an error parsing the YAML file.
+        FileNotFoundError: If the file doesn't exist.
+    """
+    logger.debug(f"Attempting to load YAML file: {file_path}")
+    try:
+        with open(file_path, 'r') as file:
+            data = yaml.safe_load(file)
+        logger.debug(f"Successfully loaded YAML file: {file_path}")
+        return data
+    except FileNotFoundError:
+        logger.error(f"YAML file not found: {file_path}")
+        raise
+    except yaml.YAMLError as e:
+        logger.error(f"Error parsing YAML file {file_path}: {e}")
+        raise
+
+def get_input_with_timeout(prompt, timeout=5):
+    print(prompt, end='', flush=True)
+    rlist, _, _ = select.select([sys.stdin], [], [], timeout)
+    if rlist:
+        return sys.stdin.readline().strip()
+    else:
+        print("\nNo input received, proceeding automatically.")
+        return ''
+
+def write_to_file_any(data: dict, destination_folder: str, filename: str):
+
+    filepath = Path(destination_folder+'/'+filename+'.json')
+
+    if filepath.exists():
+        with open(filepath, 'r+') as f:
+            try:
+                existing_data = json.load(f)
+            except json.JSONDecodeError:
+                logger.error(f"JSON decode error in file: {filepath}")
+                existing_data = []
+            existing_data.append(data)
+            f.seek(0)
+            json.dump(existing_data, f, indent=4)
+            f.truncate()
+            logger.debug(f"Job data appended to existing file: {file_name}")
+    else:
+        with filepath.open('w') as f:
+            json.dump([data], f, indent=4)
