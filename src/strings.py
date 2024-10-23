@@ -6,13 +6,37 @@ Answer the following question based on the provided personal information.
 - Answer questions directly.
 
 ## Example
+- Look for the appropiate section within {resume_section} based on the question.
+
+## Example 1
 My resume: John Doe, born on 01/01/1990, living in Milan, Italy.
 Question: What is your city?
  Milan
 
+## Example 2
+My Resume:  headline: Python Developer | Data Engineer
+Question: Headline
+ Python Developer | Data Engineer
+
 Personal Information: {resume_section}
 Question: {question}
 """
+
+summary_template = """
+Answer the following question based on the provided personal information.
+
+## Rules
+- Answer questions directly.
+- If summary found in {resume_section} use that.
+
+## Example
+My resume: "Experienced professional with four years of experience building ETL pipelines, data anlytics dashboards, and applying machine learning models. I have expereince using tools like Python, SQL, and cloud environments.
+
+Summary: {resume_section}
+Question: {question}
+
+"""
+
 
 # Self Identification Template
 self_identification_template = """
@@ -144,11 +168,17 @@ Answer the following question based on the provided salary expectations.
 - Answer questions directly.
 - Keep the answer under 140 characters.
 - Use periods only if the answer has multiple sentences.
+- Do not use single integers.
 
-## Example
+## Example 1
 My resume: Looking for a salary in the range of 50k-60k USD.
 Question: What are your salary expectations?
-55000.
+55000
+
+## Example 2
+My resume: Looking for a salary in the range of 100k-120k USD
+Question: What is your desired salary range?
+100000-120000
 
 Salary Expectations: {resume_section}
 Question: {question}
@@ -248,7 +278,8 @@ Please write the cover letter in a way that directly addresses the job role and 
 ## Rules:
 - Provide only the text of the cover letter.
 - Do not include any introductions, explanations, or additional information.
-- The letter should be formatted into paragraph.
+- The letter should be formatted into paragraphs
+- avoide phrases like "I am thrilled" or "I am excited"
 
 ## Job Description:
 ```
@@ -258,29 +289,37 @@ Please write the cover letter in a way that directly addresses the job role and 
 ```
 {resume}
 ```
+## Example 1
+I am passionate about enhancing workflows and utilizing machine learning in the healthcare industry. With over seven years of professional experience, I have dedicated four years to developing custom data pipelines and healthcare solutions. My experience includes analyzing large datasets, constructing predictive models, and working closely with cross-functional teams. I excel in solving complex problems and optimizing processes to deliver tangible value.
+I invite you to review my resume to better understand my professional background and accomplishments. Thank you for considering my application. I am eager to discuss how my background, skills, and experience align with your team's needs.
+
 """
 
 numeric_question_template = """
 Read the following resume carefully and answer the specific questions regarding the candidate's experience with a number of years. Follow these strategic guidelines when responding:
 
-1. **Related and Inferred Experience:**
+1. **Explicit Skills:**
+   - **Listed Skill:** Look for the skill in {resume_skills} and find years of experience associated with that skill. If you cannot determine a number estimate expereince based on the following guidelines.
+
+2. **Related and Inferred Experience:**
    - **Similar Technologies:** If experience with a specific technology is not explicitly stated, but the candidate has experience with similar or related technologies, provide a plausible number of years reflecting this related experience. For instance, if the candidate has experience with Python and projects involving technologies similar to Java, estimate a reasonable number of years for Java.
    - **Projects and Studies:** Examine the candidate’s projects and studies to infer skills not explicitly mentioned. Complex and advanced projects often indicate deeper expertise.
 
-2. **Indirect Experience and Academic Background:**
+3. **Indirect Experience and Academic Background:**
    - **Type of University and Studies:** Consider the type of university and course followed.
    - **Exam Grades:** Consider exam grades achieved. High grades in relevant subjects can indicate stronger proficiency and understanding.
    - **Relevant thesis:** Consider the thesis of the candidate has worked. Advanced projects suggest deeper skills.
    - **Roles and Responsibilities:** Evaluate the roles and responsibilities held to estimate experience with specific technologies or skills.
 
 
-3. **Experience Estimates:**
+4. **Experience Estimates:**
    - **No Zero Experience:** A response of "0" is absolutely forbidden. If direct experience cannot be confirmed, provide a minimum of "2" years based on inferred or related experience.
    - **For Low Experience (up to 5 years):** Estimate experience based on inferred bacherol, skills and projects, always providing at least "2" years when relevant.
    - **For High Experience:** For high levels of experience, provide a number based on clear evidence from the resume. Avoid making inferences for high experience levels unless the evidence is strong.
 
-4. **Rules:**
+5. **Rules:**
    - Answer the question directly with a number, avoiding "0" entirely.
+   - IPython and iPython refers to Jupyter Notebooks
 
 ## Example 1
 ```
@@ -325,12 +364,25 @@ How many years of experience do you have with AI?
 
 2
 ```
+## Example 4
+```
+## Skills
+skill: Python, years of experience: 9, proficiency: Expert
+
+## Question
+
+How many years of experience do you have with Python?
+
+## Answer
+
+9
 
 ## Resume:
 ```
 {resume_educations}
 {resume_jobs}
 {resume_projects}
+{resume_skills}
 ```
         
 ## Question:
@@ -411,3 +463,14 @@ func_summarize_prompt_template = """
         {text_with_placeholders}
         
         ## Text without placeholders:"""
+
+
+
+phrases_requiring_review = [
+            "explain why you're interested",
+            "why do you want to work",
+            "tell us about yourself",
+            "describe your ideal work environment",
+            "fun and unique"
+            "describe a time"
+        ]

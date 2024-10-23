@@ -428,6 +428,7 @@ class GPTAnswerer:
             "projects": self._create_chain(strings.projects_template),
             "availability": self._create_chain(strings.availability_template),
             "salary_expectations": self._create_chain(strings.salary_expectations_template),
+            "skills": self._create_chain(strings.numeric_question_template),
             "certifications": self._create_chain(strings.certifications_template),
             "languages": self._create_chain(strings.languages_template),
             "interests": self._create_chain(strings.interests_template),
@@ -447,6 +448,7 @@ class GPTAnswerer:
         - Availability
         - Salary Expectations
         - Certifications
+        - Skills
         - Languages
         - Interests
         - Cover letter
@@ -455,7 +457,7 @@ class GPTAnswerer:
 
         1. **Personal Information**:
         - **Purpose**: Contains your basic contact details and online profiles.
-        - **Use When**: The question is about how to contact you or requests links to your professional online presence.
+        - **Use When**: The question is about how to contact you, requests links to your professional online presence, asks for a headline, or asks for a summary.
         - **Examples**: Email address, phone number, AIHawk profile, GitHub repository, personal website.
 
         2. **Self Identification**:
@@ -517,6 +519,11 @@ class GPTAnswerer:
             - **Purpose**: Contains your personalized cover letter or statement.
             - **Use When**: The question involves your cover letter or specific written content intended for the job application.
             - **Examples**: Cover letter content, personalized statements.
+        
+        14. **Skills**:
+            - **Purpose**: Contains your additional skills and years of experience.
+            - **Use When**: The question asks about how many years of experience with a given skill
+            - **Examples**: Skill, years of exerience, and proficiency level.
 
         Provide only the exact name of the section from the list above with no additional text.
         """
@@ -527,7 +534,7 @@ class GPTAnswerer:
         match = re.search(
             r"(Personal information|Self Identification|Legal Authorization|Work Preferences|Education "
             r"Details|Experience Details|Projects|Availability|Salary "
-            r"Expectations|Certifications|Languages|Interests|Cover letter)",
+            r"Expectations|Certifications|Skills|Languages|Interests|Cover letter)",
             output, re.IGNORECASE)
         if not match:
             raise ValueError(
@@ -564,7 +571,7 @@ class GPTAnswerer:
         chain = prompt | self.llm_cheap | StrOutputParser()
         output_str = chain.invoke(
             {"resume_educations": self.resume.education_details, "resume_jobs": self.resume.experience_details,
-             "resume_projects": self.resume.projects, "question": question})
+             "resume_projects": self.resume.projects, "resume_skills": self.resume.skills, "question": question})
         logger.debug(f"Raw output for numeric question: {output_str}")
         try:
             output = self.extract_number_from_string(output_str)

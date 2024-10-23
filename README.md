@@ -28,7 +28,6 @@ Connect with like-minded individuals and get the most out of AIHawk.
 
 <!-- Strong Call to Action -->
 ### Join Now 👇
-
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white
 )](https://t.me/AIhawkCommunity)
 
@@ -105,7 +104,6 @@ Auto_Jobs_Applier_AIHawk steps in as a game-changing solution to these challenge
 ## Installation
 
 **Confirmed successful runs on the following:**
-
 - Operating Systems:
   - Windows 10
   - Ubuntu 22
@@ -126,7 +124,6 @@ Auto_Jobs_Applier_AIHawk steps in as a game-changing solution to these challenge
    - Download and install the latest version of Google Chrome in its default location from the [official website](https://www.google.com/chrome).
 
 3. **Clone the repository:**
-
    ```bash
    git clone https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk.git
    
@@ -134,7 +131,6 @@ Auto_Jobs_Applier_AIHawk steps in as a game-changing solution to these challenge
    ```
 
 4. **Activate virtual environment:**
-
    ```bash
    python3 -m venv virtual
    ```
@@ -144,13 +140,11 @@ Auto_Jobs_Applier_AIHawk steps in as a game-changing solution to these challenge
    ```
 
    or for Windows-based machines -
-
    ```bash
    .\virtual\Scripts\activate
    ```
 
 5. **Install the required packages:**
-
    ```bash
    pip install -r requirements.txt
    ```
@@ -201,13 +195,11 @@ This file defines your job search parameters and bot behavior. Each section cont
 - `locations:`
   - List locations you want to search in, one per line
   - Example:
-
     ```yaml
     locations:
       - Italy
       - London
     ```
-
 - `apply_once_at_company: [True/False]`
   - Set to `True` to apply only once per company, `False` to allow multiple applications per company
 
@@ -218,7 +210,6 @@ This file defines your job search parameters and bot behavior. Each section cont
 - `companyBlacklist:`
   - List companies you want to exclude from your search, one per line
   - Example:
-
     ```yaml
     companyBlacklist:
       - Company X
@@ -228,13 +219,11 @@ This file defines your job search parameters and bot behavior. Each section cont
 - `titleBlacklist:`
   - List keywords in job titles you want to avoid, one per line
   - Example:
-
     ```yaml
     titleBlacklist:
       - Sales
       - Marketing
     ```
-
 #### 2.1 config.yaml - Customize LLM model endpoint
 
 - `llm_model_type`:
@@ -274,7 +263,6 @@ Each section has specific fields to fill out:
     - **github**: URL to your GitHub profile, if applicable.
     - **linkedin**: URL to your LinkedIn profile, if applicable.
   - Example
-
   ```yaml
   personal_information:
     name: "Jane"
@@ -302,7 +290,6 @@ Each section has specific fields to fill out:
     - **exam**: A list of courses or subjects taken along with their respective grades.
 
   - Example:
-
   ```yaml
   education_details:
     - education_level: "Bachelor's Degree"
@@ -372,7 +359,6 @@ Each section has specific fields to fill out:
     - **description**: A brief explanation of the achievement and its significance.
 
   - Example:
-
   ```yaml
   achievements:
     - name: "Employee of the Month"
@@ -400,7 +386,6 @@ Each section has specific fields to fill out:
     - **proficiency**: Your level of proficiency (e.g., Native, Fluent, Intermediate).
 
   - Example:
-
   ```yaml
   languages:
     - language: "English"
@@ -415,7 +400,6 @@ Each section has specific fields to fill out:
     - **interest**: A list of interests or hobbies.
 
   - Example:
-
   ```yaml
   interests:
     - "Machine Learning"
@@ -430,7 +414,6 @@ Each section has specific fields to fill out:
     - **notice_period**: The amount of time required before you can start a new role (e.g., "2 weeks", "1 month").
 
   - Example:
-
   ```yaml
   availability:
     notice_period: "2 weeks"
@@ -441,7 +424,6 @@ Each section has specific fields to fill out:
     - **salary_range_usd**: The salary range you are expecting, expressed in USD.
 
   - Example:
-
   ```yaml
   salary_expectations:
     salary_range_usd: "80000 - 100000"
@@ -456,7 +438,6 @@ Each section has specific fields to fill out:
     - **ethnicity**: Your ethnicity.
 
   - Example:
-
   ```yaml
   self_identification:
     gender: "Female"
@@ -517,7 +498,6 @@ Each section has specific fields to fill out:
     - **willing_to_undergo_background_checks**: Whether you are willing to undergo background checks (Yes/No).
 
   - Example:
-
   ```yaml
   work_preferences:
     remote_work: "Yes"
@@ -609,7 +589,6 @@ openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded you
 Exception: No clickable 'Easy Apply' button found
 
 **Solution:**
-
 - Ensure that you're logged properly
 - Check if the job listings you're targeting actually have the "Easy Apply" option
 - Verify that your search parameters in the `config.yaml` file are correct and returning jobs with the "Easy Apply" button
@@ -620,7 +599,6 @@ Exception: No clickable 'Easy Apply' button found
 **Issue:** Bot provides inaccurate data for experience, CTC, and notice period
 
 **Solution:**
-
 - Update prompts for professional experience specificity
 - Add fields in `config.yaml` for current CTC, expected CTC, and notice period
 - Modify bot logic to use these new config fields
@@ -632,7 +610,6 @@ Exception: No clickable 'Easy Apply' button found
 yaml.scanner.ScannerError: while scanning a simple key
 
 **Solution:**
-
 - Copy example `config.yaml` and modify gradually
 - Ensure proper YAML indentation and spacing
 - Use a YAML validator tool
@@ -643,7 +620,6 @@ yaml.scanner.ScannerError: while scanning a simple key
 **Issue:** Bot searches for jobs but continues scrolling without applying
 
 **Solution:**
-
 - Check for security checks or CAPTCHAs
 - Verify `config.yaml` job search parameters
 - Ensure your account profile meets job requirements
@@ -675,7 +651,6 @@ For detailed instructions on editing YAML configuration sections for **AIHawk**,
 - [Download YAML Editing Guide (PDF)](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/blob/main/docs/guide_yaml_sections.pdf)
 
 ### Auto-start AIHawk
-
 To make **AIHawk** automatically start when your system boots, follow the steps in this guide:
 
 - [Download Auto-start AIHawk Guide (PDF)](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/blob/main/docs/guide_to_autostart_aihawk.pdf)
@@ -709,5 +684,4 @@ Auto_Jobs_Applier_AIHawk is still in beta, and your feedback, suggestions, and c
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Disclaimer
-
 This tool, Auto_Jobs_Applier_AIHawk, is intended for educational purposes only. The creator assumes no responsibility for any consequences arising from its use. Users are advised to comply with the terms of service of relevant platforms and adhere to all applicable laws, regulations, and ethical guidelines. The use of automated tools for job applications may carry risks, including potential impacts on user accounts. Proceed with caution and at your own discretion.

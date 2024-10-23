@@ -2,6 +2,7 @@ import json
 import os
 import random
 import time
+from datetime import datetime
 from itertools import product
 from pathlib import Path
 
@@ -44,6 +45,10 @@ class AIHawkJobManager:
         self.set_old_answers = set()
         self.easy_applier_component = None
         logger.debug("AIHawkJobManager initialized successfully")
+        self.global_applications_count = 0
+        self.failed_applications_count = 0
+        self.max_num_jobs = None
+        self.max_fail = None
 
     def set_parameters(self, parameters):
         logger.debug("Setting parameters for AIHawkJobManager")
@@ -63,6 +68,11 @@ class AIHawkJobManager:
         self.resume_path = Path(resume_path) if resume_path and Path(resume_path).exists() else None
         self.output_file_directory = Path(parameters['outputFileDirectory'])
         self.env_config = EnvironmentKeys()
+
+        self.max_num_jobs = parameters.get('maxNumJobs')
+        self.max_fail = parameters.get('maxFail')
+        logger.debug(f"Maximum number of jobs to apply: {self.max_num_jobs}")
+
         logger.debug("Parameters set successfully")
 
     def set_gpt_answerer(self, gpt_answerer):
@@ -75,6 +85,7 @@ class AIHawkJobManager:
 
     def start_collecting_data(self):
         searches = list(product(self.positions, self.locations))
+        logger.info(f"There are {len(searches)} search criterias: {searches}")
         random.shuffle(searches)
         page_sleep = 0
         minimum_time = 60 * 5
@@ -127,11 +138,15 @@ class AIHawkJobManager:
         page_sleep = 0
         minimum_time = MINIMUM_WAIT_TIME
         minimum_page_time = time.time() + minimum_time
+        self.successful_applications_count = 0
 
         for position, location in searches:
             location_url = "&location=" + location
             job_page_number = -1
             logger.debug(f"Starting the search for {position} in {location}.")
+            self.local_successful_applications_count = 0
+            logger.info(f"Total Applications Count: {self.successful_applications_count}")
+            
 
             try:
                 while True:
@@ -152,14 +167,26 @@ class AIHawkJobManager:
                         break
 
                     try:
-                        self.apply_jobs()
+                        self.apply_jobs(position, location)
+                        self.successful_applications_count += self.local_successful_applications_count
                     except Exception as e:
                         logger.error(f"Error during job application: {e}")
                         continue
 
                     logger.debug("Applying to jobs on this page has been completed!")
+                    
 
                     time_left = minimum_page_time - time.time()
+
+                    logger.debug(f"Checking numbers:\nLocal Count: {self.local_successful_applications_count}\nSuccess Count: {self.successful_applications_count}\nGlobal Count: {self.global_applications_count}\nmaxNumJobs: {self.max_num_jobs}")
+                    user_input = utils.get_input_with_timeout(f"Type 'p' to pause or press enter to continue...", timeout=10)
+                    if user_input == "p":
+                        logger.info("User chose to review. Pausing progression.")
+                        input("Press Enter when ready to continue...")
+                    
+                    if self.max_num_jobs is not None and self.successful_applications_count >= self.max_num_jobs*len(searches):
+                        logger.info(f"Reached maximum number of job applications ({self.max_num_jobs}) for {position} positions in {location}. Stopping the process.")
+                        return
 
                     # Ask user if they want to skip waiting, with timeout
                     if time_left > 0:
@@ -286,7 +313,7 @@ class AIHawkJobManager:
                 self.write_to_file(job, "failed")
                 continue
 
-    def apply_jobs(self):
+    def apply_jobs(self, position, location):
         try:
             no_jobs_element = self.driver.find_element(By.CLASS_NAME, 'jobs-search-two-pane__no-results-banner--expand')
             if 'No matching jobs found' in no_jobs_element.text or 'unfortunately, things aren' in self.driver.page_source.lower():
@@ -303,6 +330,8 @@ class AIHawkJobManager:
             return
 
         job_list = [Job(*self.extract_job_information_from_tile(job_element)) for job_element in job_list_elements]
+        
+        
 
         for job in job_list:
 
@@ -360,6 +389,11 @@ class AIHawkJobManager:
             # Continue with the job application process regardless of the applicants count check
             """
         
+            logger.debug(f"Checking numbers:\nLocal Count: {self.local_successful_applications_count}\nSuccess Count: {self.successful_applications_count}\nGlobal Count: {self.global_applications_count}\nmaxNumJobs: {self.max_num_jobs}")
+            user_input = utils.get_input_with_timeout(f"Type 'p' to pause or press enter to continue...", timeout=10)
+            if user_input == "p":
+                logger.info("User chose to review. Pausing progression.")
+                input("Press Enter when ready to continue...")
 
             if self.is_blacklisted(job.title, job.company, job.link):
                 logger.debug(f"Job blacklisted: {job.title} at {job.company}")
@@ -374,10 +408,31 @@ class AIHawkJobManager:
             try:
                 if job.apply_method not in {"Continue", "Applied", "Apply"}:
                     self.easy_applier_component.job_apply(job)
+                    self.local_successful_applications_count += 1
+                    self.global_applications_count += 1
                     self.write_to_file(job, "success")
                     logger.debug(f"Applied to job: {job.title} at {job.company}")
+                    logger.info(f"Applied to {self.local_successful_applications_count} jobs for {current_position} in {current_location}.")
+                    logger.info(f"Applied to {self.global_applications_count} jobs so far.")
+
+                    logger.debug(f"Checking numbers:\nLocal Count: {self.local_successful_applications_count}\nSuccess Count: {self.successful_applications_count}\nGlobal Count: {self.global_applications_count}\nmaxNumJobs: {self.max_num_jobs}")
+                    user_input = utils.get_input_with_timeout(f"Type 'p' to pause or press enter to continue...", timeout=10)
+                    if user_input == "p":
+                        logger.info("User chose to review. Pausing progression.")
+                        input("Press Enter when ready to continue...")
+
+                    if self.max_num_jobs is not None and self.local_successful_applications_count >= self.max_num_jobs:
+                        logger.info(f"Reached maximum number of job applications ({self.max_num_jobs}) for {current_position} in {current_location}. Stopping applications for this search.")
+                        return
+
             except Exception as e:
                 logger.error(f"Failed to apply for {job.title} at {job.company}: {e}")
+                self.failed_applications_count += 1
+                logger.info(f"Failed to apply for {self.failed_applications_count} jobs so far.")
+
+                if self.max_fail is not None and self.failed_applications_count >= self.max_fail:
+                    logger.debug(f"Reached max fail, did your new feature work?")
+                    return
                 self.write_to_file(job, "failed")
                 continue
 
@@ -386,6 +441,7 @@ class AIHawkJobManager:
         pdf_path = Path(job.pdf_path).resolve()
         pdf_path = pdf_path.as_uri()
         data = {
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "company": job.company,
             "job_title": job.title,
             "link": job.link,

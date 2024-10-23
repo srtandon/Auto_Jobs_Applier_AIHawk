@@ -20,6 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 import src.utils as utils
+from src.strings import phrases_requiring_review
 from loguru import logger
 
 
@@ -38,6 +39,29 @@ class AIHawkEasyApplier:
         self.current_job = None
 
         logger.debug("AIHawkEasyApplier initialized successfully")
+
+    def _log_direct_apply_job(self, job: Any):
+        logger.debug(f"Logging direct apply job: {job.title}")
+        job_data = {
+            "title": job.title,
+            "link": job.link
+        }
+
+        if self.direct_apply_file.exists():
+            with open(self.direct_apply_file, 'r+') as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = []
+                data.append(job_data)
+                f.seek(0)
+                json.dump(data, f, indent=4)
+                f.truncate()
+        else:
+            with open(self.direct_apply_file, 'w') as f:
+                json.dump([job_data], f, indent=4)
+
+        logger.info(f"Job '{job.title}' logged as direct apply")
 
     def _load_questions_from_json(self) -> List[dict]:
         output_file = 'answers.json'
@@ -221,6 +245,7 @@ class AIHawkEasyApplier:
 
         page_source = self.driver.page_source
         logger.error(f"No clickable 'Easy Apply' button found after 2 attempts. Page source:\n{page_source}")
+        self._log_direct_apply_job(job)
         raise Exception("No clickable 'Easy Apply' button found")
 
     def _get_job_description(self) -> str:
@@ -284,10 +309,13 @@ class AIHawkEasyApplier:
     def _fill_application_form(self, job):
         logger.debug(f"Filling out application form for job: {job}")
         while True:
-            self.fill_up(job)
-            if self._next_or_submit():
-                logger.debug("Application form submitted")
-                break
+            try:
+                self.fill_up(job)
+                if self._next_or_submit():
+                    logger.debug("Application form submitted")
+                    break
+            except HumanReviewRequired as e:
+                self._handle_human_review(job, str(e))
 
     def _next_or_submit(self):
         logger.debug("Clicking 'Next' or 'Submit' button")
@@ -296,14 +324,30 @@ class AIHawkEasyApplier:
         if 'submit application' in button_text:
             logger.debug("Submit button found, submitting application")
             self._unfollow_company()
+
+            user_input = utils.get_input_with_timeout("Application ready to submit. Press Enter to continue, or type 'r' to make changes (10s timeout): ", timeout=10)
+            if user_input.lower() == 'r':
+                logger.info("User chose to edit. Pausing submission.")
+                input("Press Enter when ready to continue...")
+                
             time.sleep(random.uniform(1.5, 2.5))
             next_button.click()
             time.sleep(random.uniform(1.5, 2.5))
             return True
-        time.sleep(random.uniform(1.5, 2.5))
-        next_button.click()
-        time.sleep(random.uniform(3.0, 5.0))
-        self._check_for_errors()
+        else:
+            pause_duration = random.uniform(5.0, 10.0)
+            logger.debug(f"Pausing for {pause_duration:.2f} seconds before clicking 'Next'")
+            time.sleep(pause_duration)
+            
+            user_input = utils.get_input_with_timeout("About to proceed to next section. Press Enter to continue, or type 'e' to pause (10s timeout): ", timeout=10)
+            if user_input.lower() == 'e':
+                logger.info("User chose to review. Pausing progression.")
+                input("Press Enter when ready to continue...")
+            
+            logger.debug("Clicking 'Next' button")
+            next_button.click()
+            time.sleep(random.uniform(3.0, 5.0))
+            self._check_for_errors()
 
     def _unfollow_company(self) -> None:
         try:
@@ -714,6 +758,7 @@ class AIHawkEasyApplier:
                 else:
                     answer = self.gpt_answerer.answer_question_textual_wide_range(question_text)
                     logger.debug(f"Generated textual answer: {answer}")
+                    
 
             self._enter_text(text_field, answer)
             logger.debug("Entered answer into the textbox.")
@@ -722,6 +767,8 @@ class AIHawkEasyApplier:
             if not is_cover_letter:
                 self._save_questions_to_json({'type': question_type, 'question': question_text, 'answer': answer})
                 logger.debug("Saved non-cover letter answer to JSON.")
+                if any(phrase in question_text for phrase in phrases_requiring_review):
+                    raise HumanReviewRequired(f"Question requires human review: {question_text}")
 
             time.sleep(1)
             text_field.send_keys(Keys.ARROW_DOWN)
@@ -838,16 +885,6 @@ class AIHawkEasyApplier:
     def _save_questions_to_json(self, question_data: dict) -> None:
         output_file = 'answers.json'
         question_data['question'] = self._sanitize_text(question_data['question'])
-
-        # Check if the question already exists in the JSON file and bail out if it does
-        for item in self.all_data:
-            if self._sanitize_text(item['question']) == question_data['question'] and item['type'] == question_data['type']:
-                logger.debug(f"Question already exists in answers.json. Aborting save of: {item['question']}")
-                return
-            if self.current_job.company in item['answer']:
-                logger.debug(f"Answer contains the Company name. Aborting save of: {item['question']}")
-                return
-
         logger.debug(f"Saving question data to JSON: {question_data}")
         try:
             try:
@@ -865,7 +902,6 @@ class AIHawkEasyApplier:
             data.append(question_data)
             with open(output_file, 'w') as f:
                 json.dump(data, f, indent=4)
-                self.all_data = data
             logger.debug("Question data saved successfully to JSON")
         except Exception:
             tb_str = traceback.format_exc()
@@ -877,3 +913,31 @@ class AIHawkEasyApplier:
         sanitized_text = re.sub(r'[\x00-\x1F\x7F]', '', sanitized_text).replace('\n', ' ').replace('\r', '').rstrip(',')
         logger.debug(f"Sanitized text: {sanitized_text}")
         return sanitized_text
+
+    def _handle_human_review(self, job, reason):
+        self.human_review_flag = True
+        logger.info(f"Human review required: {reason}")
+        log_data = {
+            "job_title": job.title,
+            "company": job.company,
+            "reason": reason,
+            "link": job.link
+        }
+        utils.write_to_file_any(log_data, 'data_folder/output', 'human_review')
+        self._save_application()
+        raise Exception("AIHawk encountered complex questions and has been flagged for human review and saved.")
+    
+    def _save_application(self):
+        try:
+            self.driver.find_element(By.CLASS_NAME, 'artdeco-modal__dismiss').click()
+            time.sleep(random.uniform(3, 5))
+            save_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Save')]"))
+            )
+            save_button.click()
+            logger.info("Application saved for later review")
+        except Exception as e:
+            logger.error(f"Failed to save application: {e}")
+
+class HumanReviewRequired(Exception):
+    pass
