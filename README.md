@@ -3,18 +3,22 @@
 
 <!-- At first glance, the branding and messaging clearly conveys what to expect -->
 
-  <!-- [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/AIhawkCommunity) -->
 
+  <!-- [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/AIhawkCommunity) -->
+ 
   [![Gmail](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:federico.elia.majo@gmail.com)
 
-# Auto_Jobs_Applier_AIHawk
-
+  # Auto_Jobs_Applier_AIHawk
   ![CI](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/actions/workflows/ci.yml/badge.svg)
 
-**🤖🔍 Your AI-powered job search assistant. Automate applications, get personalized recommendations, and land your dream job faster.**
+  #### 🤖🔍 Your AI-powered job search assistant. Automate applications, get personalized recommendations, and land your dream job faster.
+
+
+
+<br />
 
 <!-- Message Clarity -->
-## 🚀 Join the AIHawk Community 🚀
+## 🚀 Join the AIHawk Community 🚀 
 
 Connect with like-minded individuals and get the most out of AIHawk.
 
@@ -103,7 +107,7 @@ Auto_Jobs_Applier_AIHawk steps in as a game-changing solution to these challenge
 
 ## Installation
 
-**Confirmed successful runs on the following:**
+**Confirmed succesfull runs on the following:**
 - Operating Systems:
   - Windows 10
   - Ubuntu 22
@@ -157,7 +161,7 @@ This file contains sensitive information. Never share or commit this file to ver
 
 - `llm_api_key: [Your OpenAI or Ollama API key or Gemini API key]`
   - Replace with your OpenAI API key for GPT integration
-  - To obtain an API key, follow the tutorial at: <https://medium.com/@lorenzozar/how-to-get-your-own-openai-api-key-f4d44e60c327>
+  - To obtain an API key, follow the tutorial at: https://medium.com/@lorenzozar/how-to-get-your-own-openai-api-key-f4d44e60c327
   - Note: You need to add credit to your OpenAI account to use the API. You can add credit by visiting the [OpenAI billing dashboard](https://platform.openai.com/account/billing).
   - According to the [OpenAI community](https://community.openai.com/t/usage-tier-free-to-tier-1/919150) and our users' reports, right after setting up the OpenAI account and purchasing the required credits, users still have a `Free` account type. This prevents them from having unlimited access to OpenAI models and allows only 200 requests per day. This might cause runtime errors such as:  
     `Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. ...}}`  
@@ -165,6 +169,7 @@ This file contains sensitive information. Never share or commit this file to ver
     OpenAI will update your account automatically, but it might take some time, ranging from a couple of hours to a few days.  
     You can find more about your organization limits on the [official page](https://platform.openai.com/settings/organization/limits).
   - For obtaining Gemini API key visit [Google AI for Devs](https://ai.google.dev/gemini-api/docs/api-key)
+
 
 ### 2. config.yaml
 
@@ -182,10 +187,10 @@ This file defines your job search parameters and bot behavior. Each section cont
 - `date:`
   - Choose one time range for job postings by setting it to `true`, others to `false`
 
+
 - `positions:`
   - List job titles you're interested in, one per line
   - Example:
-
     ```yaml
     positions:
       - Software Developer
@@ -228,19 +233,19 @@ This file defines your job search parameters and bot behavior. Each section cont
 
 - `llm_model_type`:
   - Choose the model type, supported: openai / ollama / claude / gemini
-- `llm_model`:
-  - Choose the LLM model, currently supported:
+- `llm_model`: 
+  - Choose the LLM model, currently supported: 
     - openai: gpt-4o
     - ollama: llama2, mistral:v0.3
-    - claude: any model
+    - claude: any model 
     - gemini: any model
-- `llm_api_url`:
+- `llm_api_url`: 
   - Link of the API endpoint for the LLM model
-    - openai: <https://api.pawan.krd/cosmosrp/v1>
-    - ollama: <http://127.0.0.1:11434/>
-    - claude: <https://api.anthropic.com/v1>
+    - openai: https://api.pawan.krd/cosmosrp/v1
+    - ollama: http://127.0.0.1:11434/
+    - claude: https://api.anthropic.com/v1
     - gemini: no api_url
-- Note: To run local Ollama, follow the guidelines here: [Guide to Ollama deployment](https://github.com/ollama/ollama)
+ - Note: To run local Ollama, follow the guidelines here: [Guide to Ollama deployment](https://github.com/ollama/ollama)
   
 ### 3. plain_text_resume.yaml
 
@@ -310,14 +315,13 @@ Each section has specific fields to fill out:
   - This section details your work experience, including job roles, companies, and key responsibilities.
     - **position**: Your job title or role.
     - **company**: The name of the company or organization where you worked.
-    - **employment_period**: The timeframe during which you were employed in the role, using the format MM/YYYY - MM/YYYY.
+    - **employment_period**: The timeframe during which you were employed in the role (e.g., MM/YYYY - MM/YYYY).
     - **location**: The city and country where the company is located.
     - **industry**: The industry or field in which the company operates.
-    - **key_responsibilities**: A list of major responsibilities or duties you had in the role, e.g. responsibility: "Developed web applications using React and Node.js".
-    - **skills_acquired**: Skills or expertise gained through this role, e.g. "React".
+    - **key_responsibilities**: A list of major responsibilities or duties you had in the role.
+    - **skills_acquired**: Skills or expertise gained through this role.
 
   - Example:
-
   ```yaml
   experience_details:
     - position: "Software Developer"
@@ -326,9 +330,9 @@ Each section has specific fields to fill out:
       location: "San Francisco, CA"
       industry: "Technology"
       key_responsibilities:
-        - responsibility: "Developed web applications using React and Node.js"
-        - responsibility: "Collaborated with cross-functional teams to design and implement new features"
-        - responsibility: "Troubleshot and resolved complex software issues"
+        - "Developed web applications using React and Node.js"
+        - "Collaborated with cross-functional teams to design and implement new features"
+        - "Troubleshot and resolved complex software issues"
       skills_acquired:
         - "React"
         - "Node.js"
@@ -341,8 +345,7 @@ Each section has specific fields to fill out:
     - **description**: A brief summary of what the project involves or its purpose.
     - **link**: URL to the project, if available (e.g., GitHub repository, website).
 
-  - Example:
-
+   - Example:
     ```yaml
     projects:
       - name: "Weather App"
@@ -369,11 +372,10 @@ Each section has specific fields to fill out:
 
 - `certifications:`
   - Include any professional certifications you have earned.
-    - name: "PMP"  
+      - name: "PMP"  
       description: "Certification for project management professionals, issued by the Project Management Institute (PMI)"
 
   - Example:
-
   ```yaml
   certifications:
     - "Certified Scrum Master"
@@ -466,8 +468,8 @@ Each section has specific fields to fill out:
     - **legally_allowed_to_work_in_uk**: Whether you are legally allowed to work in the United Kingdom (Yes/No).
     - **requires_uk_sponsorship**: Whether you require sponsorship to work in the United Kingdom (Yes/No).
 
-  - Example:
 
+  - Example:
      ```yaml
     legal_authorization:
     eu_work_authorization: "Yes"
@@ -522,7 +524,7 @@ Inside this folder, you'll find example versions of the key files:
 
 These files are already populated with fictitious but realistic data. They show you the correct format and type of information to enter in each file.
 
-#### Using the data_folder_example
+#### Usage
 
 Using this folder as a guide can be particularly helpful for:
 
@@ -530,11 +532,11 @@ Using this folder as a guide can be particularly helpful for:
 2. Seeing examples of valid data for each field
 3. Having a reference point while filling out your personal files
 
-## Usage
 
+## Usage
 0. **Account language**
    To ensure the bot works, your account language must be set to English.
-
+   
 2. **Data Folder:**
    Ensure that your data_folder contains the following files:
    - `secrets.yaml`
@@ -547,36 +549,26 @@ Using this folder as a guide can be particularly helpful for:
 
 - **Dynamic Resume Generation:**
   If you don't use the `--resume` option, the bot will automatically generate a unique resume for each application. This feature uses the information from your `plain_text_resume.yaml` file and tailors it to each specific job application, potentially increasing your chances of success by customizing your resume for each position.
-
    ```bash
    python main.py
    ```
-
 - **Using a Specific Resume:**
   If you want to use a specific PDF resume for all applications, place your resume PDF in the `data_folder` directory and run the bot with the `--resume` option:
-
   ```bash
   python main.py --resume /path/to/your/resume.pdf
   ```
 
-- **Using the colled mode:**
-  If you want to collect job data only to perform any type of data analytics you can use the bot with the `--collect` option. This will store in output/data.json file all data found from linkedin jobs offers.
 
-  ```bash
-  python main.py --collect
-  ```
-
-### Troubleshooting
+### Troubleshooting Common Issues
 
 #### 1. OpenAI API Rate Limit Errors
 
 **Error Message:**
 
-openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: <https://platform.openai.com/docs/guides/error-codes/api-errors>.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
 
 **Solution:**
-
-- Check your OpenAI API billing settings at <https://platform.openai.com/account/billing>
+- Check your OpenAI API billing settings at https://platform.openai.com/account/billing
 - Ensure you have added a valid payment method to your OpenAI account
 - Note that ChatGPT Plus subscription is different from API access
 - If you've recently added funds or upgraded, wait 12-24 hours for changes to take effect
@@ -634,7 +626,7 @@ yaml.scanner.ScannerError: while scanning a simple key
 
 For further assistance, please create an issue on the [GitHub repository](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/issues) with detailed information about your problem, including error messages and your configuration (with sensitive information removed).
 
-## Documentation
+## Setup Documents
 
 ### Ollama & Gemini Setup
 
@@ -644,8 +636,8 @@ To install and configure **Ollama** and **Gemini**, please refer to the followin
 
 Follow the instructions in these guides to ensure proper configuration of **AIHawk** with **Ollama** and **Gemini**.
 
-### Editing YAML Files
 
+### Editing YAML Files
 For detailed instructions on editing YAML configuration sections for **AIHawk**, refer to this document:
 
 - [Download YAML Editing Guide (PDF)](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/blob/main/docs/guide_yaml_sections.pdf)
@@ -665,6 +657,7 @@ Written by Rushi, [Linkedin](https://www.linkedin.com/in/rushichaganti/), suppor
 - [OpenAI API Documentation](https://platform.openai.com/docs/)
 - [Lang Chain Developer Documentation](https://python.langchain.com/v0.2/docs/integrations/components/)
 
+
 If you encounter any issues, you can open an issue on [GitHub](https://github.com/feder-cr/Auto_Jobs_Applier_AIHawk/issues).
   Please add valuable details to the subject and to the description. If you need new feature then please reflect this.  
   I'll be more than happy to assist you!
@@ -678,6 +671,7 @@ Auto_Jobs_Applier_AIHawk provides a significant advantage in the modern job mark
 - [feder-cr](https://github.com/feder-cr) - Creator and Lead Developer
 
 Auto_Jobs_Applier_AIHawk is still in beta, and your feedback, suggestions, and contributions are highly valued. Feel free to open issues, suggest enhancements, or submit pull requests to help improve the project. Let's work together to make Auto_Jobs_Applier_AIHawk an even more powerful tool for job seekers worldwide.
+
 
 ## License
 

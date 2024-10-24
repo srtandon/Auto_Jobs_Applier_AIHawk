@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import WebDriverException
-from lib_resume_builder_AIHawk import Resume, FacadeManager, ResumeGenerator, StyleManager
+from lib_resume_builder_AIHawk import Resume, StyleManager, FacadeManager, ResumeGenerator, StyleManager
 from src.utils import chrome_browser_options, safe_load_yaml
 from src.llm.llm_manager import GPTAnswerer
 from src.aihawk_authenticator import AIHawkAuthenticator
@@ -19,6 +19,8 @@ from loguru import logger
 
 # Suppress stderr only during specific operations
 original_stderr = sys.stderr
+# Suppress stderr
+# sys.stderr = open(os.devnull, 'w')
 
 class ConfigError(Exception):
     pass
@@ -119,6 +121,10 @@ class ConfigValidator:
         return secrets['llm_api_key']
 
 class FileManager:
+    @staticmethod
+    def find_file(name_containing: str, with_extension: str, at_path: Path) -> Path:
+        return next((file for file in at_path.iterdir() if name_containing.lower() in file.name.lower() and file.suffix.lower() == with_extension.lower()), None)
+    
     @staticmethod
     def validate_data_folder(app_data_folder: Path) -> tuple:
         if not app_data_folder.exists() or not app_data_folder.is_dir():

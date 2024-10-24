@@ -225,3 +225,8 @@ def write_to_file_any(data: dict, destination_folder: str, filename: str):
     else:
         with filepath.open('w') as f:
             json.dump([data], f, indent=4)
+
+
+def stringWidth(text, font, font_size):
+    bbox = font.getbbox(text)
+    return bbox[2] - bbox[0]
